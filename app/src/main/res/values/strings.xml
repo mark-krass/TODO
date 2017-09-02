@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">TODO list</string>
+    <string name="title_activity_text_view">TextView</string>
+    <string name="title_activity_done">ActivityDone</string>
+</resources>
