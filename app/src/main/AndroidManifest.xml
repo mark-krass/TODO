@@ -15,13 +15,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ActivityTwo" />
-        <activity android:name=".ActivityDone">
-            <intent-filter>
-                <action android:name="android.intent.action.done"></action>
-                <category android:name="android.intent.category.DEFAULT"></category>
-            </intent-filter>
-        </activity>
+        <activity android:name=".ActivityCreateGoal" />
+        <activity android:name=".ActivityDone"/>
     </application>
 
 </manifest>

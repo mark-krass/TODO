@@ -7,54 +7,49 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
 
-    Button btnGoal;
-    final String LOG_TAG = "myLogs";
+public class MainActivity extends AppCompatActivity {
 
-    DBHelper dbHelper;
+    private final String LOG_TAG = "myLogs";
 
-    ListView lvSimple;
-    SimpleAdapter sAdapter;
-    ArrayList<Map<String, Object>> data;
-    Map<String, Object> m;
+    private DB DataBase;
 
-    final String ATTRIBUTE_NAME_GOAL = "GOAL";
-    final int REQUEST_CODE_ADD = 1;
-    final int REQUEST_CODE_DONE = 2;
+    private SimpleAdapter sAdapter;
+    private ArrayList<Map<String, Object>> data;
+    private Map<String, Object> m;
+
+    private final String ATTRIBUTE_NAME_GOAL = "GOAL";
+    private final int REQUEST_CODE_ADD = 1;
+    private final int REQUEST_CODE_DONE = 2;
+
+    @BindView(R.id.lvSimple)
+    protected ListView lvSimple;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        btnGoal = (Button) findViewById(R.id.btnGoal);
-        btnGoal.setOnClickListener(this);
-
-        lvSimple = (ListView) findViewById(R.id.lvSimple);
-        lvSimple.setOnItemClickListener(new AdapterView.OnItemClickListener() {//Когда нажимают на пункт меню чтобы посмотреть описание или его удалить
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent("android.intent.action.done");//Открываем задачу
-                intent.putExtra("id", position);//Передаем id для отображения текста и задачи
-                startActivityForResult(intent, REQUEST_CODE_DONE);
-            }
-        });
-        dbHelper = new DBHelper(this);
-        data = new ArrayList<Map<String, Object>>();
-        start();//Вывод всех данных
+        dataOut();//Вывод всех данных
     }
 
-    private void start(){
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+    private void dataOut() {
+        DataBase = new DB(this);
+        data = new ArrayList<Map<String, Object>>();
+        SQLiteDatabase db = DataBase.getWritableDatabase();
         Cursor c = db.query("mytable", null, null, null, null, null, null);
         if (c.moveToFirst()) {//Если база данных не пуста, заполняем все названиями задач
             int goalColIndex = c.getColumnIndex("goal");
@@ -70,11 +65,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onClick(View v)//Создаем новую задачу
-    {
-        Intent intent = new Intent(this, ActivityTwo.class);
-        startActivityForResult(intent, REQUEST_CODE_ADD);
+    @OnItemClick(R.id.lvSimple)
+    protected void onItemClick(int position) {
+        Intent intent = new Intent(MainActivity.this, ActivityDone.class);//"android.intent.action.done");//Открываем задачу
+        intent.putExtra("id", position);//Передаем id для отображения текста и задачи
+        startActivityForResult(intent, REQUEST_CODE_DONE);
+    }
+
+    @OnClick(R.id.btnGoal)
+    protected void onClick() {
+        startActivityForResult(new Intent(MainActivity.this, ActivityCreateGoal.class), REQUEST_CODE_ADD);
     }
 
     @Override
@@ -93,16 +93,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void Datawrite(Intent data1){//Записываем в БД
+    private void Datawrite(Intent data1) {//Записываем в БД
         ContentValues cv = new ContentValues();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = DataBase.getWritableDatabase();
         cv.put("goal", data1.getStringExtra("goal"));
         cv.put("des", data1.getStringExtra("des"));
         long rowID = db.insert("mytable", null, cv);//Новую задачу поместили в БД
         Log.d(LOG_TAG, "row inserted, ID = " + rowID);
     }
 
-    private void Adapterwrite(Intent data1){//Записываем в адаптер
+    private void Adapterwrite(Intent data1) {//Записываем в адаптер
         m = new HashMap<String, Object>();
         m.put(ATTRIBUTE_NAME_GOAL, data1.getStringExtra("goal"));
         data.add(m);

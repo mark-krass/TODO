@@ -6,41 +6,39 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
-public class ActivityDone extends AppCompatActivity implements View.OnClickListener{
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-    Button btnDone, btnCancel;
-    TextView tvGoal, tvDescription;
+public class ActivityDone extends AppCompatActivity {
+
     private int id;
 
-    DBHelper dbHelper;
+    private DB DataBase;
 
+    @BindView(R.id.tvGoal)
+    protected TextView tvGoal;
+
+    @BindView(R.id.tvDescription)
+    protected TextView tvDescription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_done);
-
-        tvGoal = (TextView) findViewById(R.id.tvGoal);
-        tvDescription = (TextView) findViewById(R.id.tvDescription);
-
-        btnDone = (Button) findViewById(R.id.btnDone);
-        btnDone.setOnClickListener(this);
-
-        btnCancel = (Button) findViewById(R.id.btnCancel);
-        btnCancel.setOnClickListener(this);
+        ButterKnife.bind(this);
 
         Intent intent = getIntent();
         id = intent.getIntExtra("id", -1);//Получаем id, который удалить или посмотреть
 
-        dbHelper = new DBHelper(this);
+        DataBase = new DB(this);
         //datadel();
     }
 
-    private void datadel(){//Вывод на экран задачи и описания
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+    private void datadel() {//Вывод на экран задачи и описания
+        SQLiteDatabase db = DataBase.getWritableDatabase();
         Cursor c = db.query("mytable", null, null, null, null, null, null);
         c.moveToPosition(id);//По полученному id смещаемся к строке и отображем человеку задачу с описанием
         int goalColIndex = c.getColumnIndex("goal");
@@ -49,10 +47,9 @@ public class ActivityDone extends AppCompatActivity implements View.OnClickListe
         tvDescription.setText(c.getString(desColIndex));
     }
 
-    @Override
-    public void onClick(View v)
-    {
-        switch (v.getId()){
+    @OnClick({R.id.btnDone, R.id.btnCancel})
+    protected void onClick(View v) {
+        switch (v.getId()) {
             case R.id.btnDone://Обнуляем базу данных и передаем id списка, который нужно удалить в главном меню
                 Intent intent = new Intent();
                 intent.putExtra("id", id);
