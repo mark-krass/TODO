@@ -13,13 +13,13 @@ import butterknife.OnClick;
 
 public class ActivityDone extends AppCompatActivity {
 
-    private int id;
-
     @BindView(R.id.tvGoal)
     protected TextView tvGoal;
 
     @BindView(R.id.tvDescription)
     protected TextView tvDescription;
+
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +27,14 @@ public class ActivityDone extends AppCompatActivity {
         setContentView(R.layout.activity_done);
         ButterKnife.bind(this);
 
+        dataOut();
+    }
 
-
+    private void dataOut() {
         Intent intent = getIntent();
-        id = intent.getIntExtra("id", -1);//Получаем id, который удалить или посмотреть
+        position = intent.getIntExtra("position", 0);
+        tvGoal.setText(intent.getStringExtra("goal"));
+        tvGoal.setText(intent.getStringExtra("des"));
     }
 
     @OnClick({R.id.btnDone, R.id.btnCancel})
@@ -38,9 +42,9 @@ public class ActivityDone extends AppCompatActivity {
         switch (v.getId()) {
             case R.id.btnDone://Обнуляем базу данных и передаем id списка, который нужно удалить в главном меню
                 Intent intent = new Intent();
-                intent.putExtra("id", id);
+                intent.putExtra("position", position);
                 setResult(RESULT_OK, intent);
-                Toast.makeText(this, "Цель удалена", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Цель удалена", Toast.LENGTH_SHORT).show();
                 finish();
                 break;
             case R.id.btnCancel:

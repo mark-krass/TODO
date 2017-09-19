@@ -4,42 +4,30 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
 
-import static com.example.gambm.todolist.R.id.tvText;
-
 public class MainActivity extends AppCompatActivity {
-
-    private final String LOG_TAG = "myLogs";
-
-    private SimpleAdapter sAdapter;
-    private ArrayList<Map<String, Object>> data;
-    private Map<String, Object> m;
-
-    private final String ATTRIBUTE_NAME_GOAL = "GOAL";
-
-    private final int REQUEST_CODE_ADD = 1;
-    private final int REQUEST_CODE_DONE = 2;
-
-    private SharedPreferences sPref;
 
     @BindView(R.id.lvSimple)
     protected ListView lvSimple;
+
+
+    private final int REQUEST_CODE_ADD = 1;
+    private final int REQUEST_CODE_DONE = 2;
+    private final String SAVED_LIST = "saved_list";
+
+    private SharedPreferences sPref;
+    private ArrayList<UserInfo> list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,26 +35,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        data = new ArrayList<Map<String, Object>>();
-
-        dataOut();//Вывод всех данных
+        dataOut();
     }
 
     private void dataOut() {
-        Log.d(LOG_TAG, "0");
-        Map<String, ?> keys = sPref.getAll();
-        Log.d(LOG_TAG, "1");
-        for (Map.Entry<String, ?> entry : keys.entrySet()) {
-            Log.d(LOG_TAG, "2");
-            Log.d(LOG_TAG, entry.getKey() + ": " + entry.getValue().toString());
-            Log.d(LOG_TAG, "3");
+        sPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor edit = sPref.edit();
+        edit.clear();
+        edit.commit();
+        String saved_list = sPref.getString(SAVED_LIST, null);
+        if (saved_list != null) {
+            list.addAll(new Gson().fromJson(saved_list, ArrayList.class));
+            list.addAll(new Gson().fromJson(saved_list, ArrayList.class));
+            Adapterwrite();
         }
     }
 
     @OnItemClick(R.id.lvSimple)
-    protected void onItemClick(int position, View v) {
-        Intent intent = new Intent(MainActivity.this, ActivityDone.class);//"android.intent.action.done");//Открываем задачу
-        intent.putExtra("id", position);//Передаем id для отображения текста и задачи
+    protected void onItemClick(int position) {
+        Intent intent = new Intent(MainActivity.this, ActivityDone.class);
+        intent.putExtra("position", position);
+        intent.putExtra("goal", list.get(position));
+        intent.putExtra("des", list.get(position));
         startActivityForResult(intent, REQUEST_CODE_DONE);
     }
 
@@ -76,35 +66,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data1) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case REQUEST_CODE_ADD://БД и список  складируем
-                    Datawrite(data1);
-                    Adapterwrite(data1);
+                case REQUEST_CODE_ADD://Pref и список  складируем
+                    DatawriteAdd(data);
                     break;
                 case REQUEST_CODE_DONE:
-                    data.remove(data1.getIntExtra("id", -1));//Удалили пункт меню
-                    sAdapter.notifyDataSetChanged();
-                    break;
+                    DatawriteDone(data);
             }
         }
+        Adapterwrite();
     }
 
-    private void Datawrite(Intent data1) {//Записываем в БД
+    private void DatawriteAdd(Intent data) {//Записываем в БД
         sPref = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putString(data1.getStringExtra("goal"), data1.getStringExtra("goal"));
-        ed.putString(data1.getStringExtra("goal") + "1", data1.getStringExtra("des"));
+        SharedPreferences.Editor edit = sPref.edit();
+        list.add(data.getStringExtra("goal"));
+        list.add(data.getStringExtra("des"));
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        edit.putString(SAVED_LIST, json);
+        edit.commit();
     }
 
-    private void Adapterwrite(Intent data1) {//Записываем в адаптер
-        m = new HashMap<String, Object>();
-        m.put(ATTRIBUTE_NAME_GOAL, data1.getStringExtra("goal"));
-        data.add(m);
-        String[] from = {ATTRIBUTE_NAME_GOAL};
-        int[] to = {tvText};
-        sAdapter = new SimpleAdapter(this, data, R.layout.item, from, to);
-        lvSimple.setAdapter(sAdapter);//Новый пункт добавили в список
+    private void DatawriteDone(Intent data) {
+        list.remove(data.getIntExtra("position", 0));
+        sPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor edit = sPref.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        edit.putString(SAVED_LIST, json);
+        edit.commit();
+    }
+
+    private void Adapterwrite() {//Записываем в адаптер
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
+        lvSimple.setAdapter(adapter);
     }
 }

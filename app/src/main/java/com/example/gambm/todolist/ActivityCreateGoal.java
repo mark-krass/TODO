@@ -34,11 +34,11 @@ public class ActivityCreateGoal extends AppCompatActivity {
                 intent.putExtra("goal", etGoal.getText().toString());
                 intent.putExtra("des", etDescription.getText().toString());
                 setResult(RESULT_OK, intent);
-                Toast.makeText(this, "Цель добавлена!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Цель добавлена!", Toast.LENGTH_SHORT).show();
                 finish();
                 break;
             case R.id.btnBack:
-                Toast.makeText(this, "Данные не сохранены", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Данные не сохранены", Toast.LENGTH_SHORT).show();
                 finish();
                 break;
         }
