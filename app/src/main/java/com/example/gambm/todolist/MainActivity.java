@@ -40,9 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void dataOut() {
         sPref = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor edit = sPref.edit();
-        edit.clear();
-        edit.commit();
         String saved_list = sPref.getString(SAVED_LIST, null);
         if (saved_list != null) {
             list.addAll(new Gson().fromJson(saved_list, ArrayList.class));
