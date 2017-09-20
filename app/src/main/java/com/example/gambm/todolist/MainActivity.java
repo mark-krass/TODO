@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sPref;
     private ArrayList<UserInfo> list = new ArrayList<>();
+    private UserInfo obj = new UserInfo();
+    private BoxAdapter boxAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         String saved_list = sPref.getString(SAVED_LIST, null);
         if (saved_list != null) {
             list.addAll(new Gson().fromJson(saved_list, ArrayList.class));
-            list.addAll(new Gson().fromJson(saved_list, ArrayList.class));
             Adapterwrite();
         }
     }
@@ -52,8 +53,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onItemClick(int position) {
         Intent intent = new Intent(MainActivity.this, ActivityDone.class);
         intent.putExtra("position", position);
-        intent.putExtra("goal", list.get(position));
-        intent.putExtra("des", list.get(position));
+        obj = list.get(position);
+        intent.putExtra("goal", obj.getGoal());
+        intent.putExtra("des", obj.getDes());
         startActivityForResult(intent, REQUEST_CODE_DONE);
     }
 
@@ -76,11 +78,12 @@ public class MainActivity extends AppCompatActivity {
         Adapterwrite();
     }
 
-    private void DatawriteAdd(Intent data) {//Записываем в БД
+    private void DatawriteAdd(Intent data) {//Записываем в Pref
         sPref = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor edit = sPref.edit();
-        list.add(data.getStringExtra("goal"));
-        list.add(data.getStringExtra("des"));
+        obj.setGoal(data.getStringExtra("goal"));
+        obj.setDes(data.getStringExtra("des"));
+        list.add(obj);
         Gson gson = new Gson();
         String json = gson.toJson(list);
         edit.putString(SAVED_LIST, json);
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void Adapterwrite() {//Записываем в адаптер
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-        lvSimple.setAdapter(adapter);
+        boxAdapter = new BoxAdapter(this, list);
+        lvSimple.setAdapter(boxAdapter);
     }
 }

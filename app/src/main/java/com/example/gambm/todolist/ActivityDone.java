@@ -34,7 +34,7 @@ public class ActivityDone extends AppCompatActivity {
         Intent intent = getIntent();
         position = intent.getIntExtra("position", 0);
         tvGoal.setText(intent.getStringExtra("goal"));
-        tvGoal.setText(intent.getStringExtra("des"));
+        tvDescription.setText(intent.getStringExtra("des"));
     }
 
     @OnClick({R.id.btnDone, R.id.btnCancel})
