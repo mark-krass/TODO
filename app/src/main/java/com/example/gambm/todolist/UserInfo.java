@@ -1,6 +1,6 @@
 package com.example.gambm.todolist;
 
-public class UserInfo {
+/*public class UserInfo {
 
     private String goal, des;
 
@@ -18,5 +18,15 @@ public class UserInfo {
 
     public String getDes() {
         return this.des;
+    }
+}*/
+
+public class UserInfo {
+
+    String goal, des;
+
+    UserInfo(String _goal, String _des) {
+        goal = _goal;
+        des = _des;
     }
 }

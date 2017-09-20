@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class BoxAdapter extends BaseAdapter {
 
     private LayoutInflater lInflater;
-    private ArrayList<UserInfo> list = new ArrayList<>();
+    private ArrayList<UserInfo> list;
     private Context ctx;
 
     BoxAdapter(Context context, ArrayList<UserInfo> userInfo) {
@@ -43,11 +43,12 @@ public class BoxAdapter extends BaseAdapter {
             view = lInflater.inflate(R.layout.item, parent, false);
         }
         UserInfo u = getUserInfo(position);
-        ((TextView) view.findViewById(R.id.tvGoali)).setText(u.getGoal());
+        ((TextView) view.findViewById(R.id.tvGoali)).setText(u.goal);
         return view;
     }
 
     private UserInfo getUserInfo(int position) {
         return ((UserInfo) getItem(position));
     }
+
 }
