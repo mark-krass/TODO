@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -30,10 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sPref;
     private ArrayList<UserInfo> list = new ArrayList<>();
-    //private UserInfo obj = new UserInfo();
-    private BoxAdapter boxAdapter;
-
-    private final String LOG_TAG = "myLogs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +43,9 @@ public class MainActivity extends AppCompatActivity {
         sPref = getPreferences(MODE_PRIVATE);
         String saved_list = sPref.getString(SAVED_LIST, null);
         if (saved_list != null) {
-            Log.d(LOG_TAG, "0");
-
             Type listType = new TypeToken<ArrayList<UserInfo>>(){}.getType();
             List<UserInfo> newList = new Gson().fromJson(saved_list, listType);
             list.addAll(newList);
-
-            Log.d(LOG_TAG, "1");
             Adapterwrite();
         }
     }
@@ -63,9 +54,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onItemClick(int position) {
         Intent intent = new Intent(MainActivity.this, ActivityDone.class);
         intent.putExtra("position", position);
-        /*obj = list.get(position);
-        intent.putExtra("goal", obj.getGoal());
-        intent.putExtra("des", obj.getDes());*/
         UserInfo obj = list.get(position);
         intent.putExtra("goal", obj.getGoal());
         intent.putExtra("des", obj.getDes());
@@ -94,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
     private void DatawriteAdd(Intent data) {//Записываем в Pref
         sPref = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor edit = sPref.edit();
-        /*obj.setGoal(data.getStringExtra("goal"));
-        obj.setDes(data.getStringExtra("des"));
-        list.add(obj);Вот тут все проблемы. В строчке ниже присутствует модификатор new, который решает проблему. Сюда его поставить не получилось*/
         list.add(new UserInfo(data.getStringExtra("goal"), data.getStringExtra("des")));
         Gson gson = new Gson();
         String json = gson.toJson(list);
@@ -114,11 +99,7 @@ public class MainActivity extends AppCompatActivity {
         edit.commit();
     }
 
-    private void Adapterwrite() {//Записываем в адаптер
-        Log.d(LOG_TAG, "2");
-        boxAdapter = new BoxAdapter(this, list);
-        Log.d(LOG_TAG, "3");
-        lvSimple.setAdapter(boxAdapter);
-        Log.d(LOG_TAG, "4");
+    private void Adapterwrite() {
+        lvSimple.setAdapter(new BoxAdapter(this, list));
     }
 }
