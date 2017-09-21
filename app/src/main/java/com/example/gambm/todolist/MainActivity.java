@@ -8,8 +8,11 @@ import android.util.Log;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,7 +49,11 @@ public class MainActivity extends AppCompatActivity {
         String saved_list = sPref.getString(SAVED_LIST, null);
         if (saved_list != null) {
             Log.d(LOG_TAG, "0");
-            list.addAll(new Gson().fromJson(saved_list, ArrayList.class));
+
+            Type listType = new TypeToken<ArrayList<UserInfo>>(){}.getType();
+            List<UserInfo> newList = new Gson().fromJson(saved_list, listType);
+            list.addAll(newList);
+
             Log.d(LOG_TAG, "1");
             Adapterwrite();
         }
@@ -60,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("goal", obj.getGoal());
         intent.putExtra("des", obj.getDes());*/
         UserInfo obj = list.get(position);
-        intent.putExtra("goal", obj.goal);
-        intent.putExtra("des", obj.des);
+        intent.putExtra("goal", obj.getGoal());
+        intent.putExtra("des", obj.getDes());
         startActivityForResult(intent, REQUEST_CODE_DONE);
     }
 

@@ -8,11 +8,12 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BoxAdapter extends BaseAdapter {
 
     private LayoutInflater lInflater;
-    private ArrayList<UserInfo> list;
+    private List<UserInfo> list;
     private Context ctx;
 
     BoxAdapter(Context context, ArrayList<UserInfo> userInfo) {
@@ -43,7 +44,7 @@ public class BoxAdapter extends BaseAdapter {
             view = lInflater.inflate(R.layout.item, parent, false);
         }
         UserInfo u = getUserInfo(position);
-        ((TextView) view.findViewById(R.id.tvGoali)).setText(u.goal);
+        ((TextView) view.findViewById(R.id.tvGoali)).setText(u.getGoal());
         return view;
     }
 
