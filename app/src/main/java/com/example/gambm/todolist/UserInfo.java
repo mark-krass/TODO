@@ -4,10 +4,9 @@ public class UserInfo {
 
     private String goal, des;
 
-    UserInfo(String goal, String des) {
-        this.goal = goal;
-        this.des = des;
-    }
+    public void setGoal(String goal){this.goal = goal;}
+
+    public void setDes(String des){this.des = des;}
 
     public String getGoal() {
         return goal;

@@ -82,7 +82,10 @@ public class MainActivity extends AppCompatActivity {
     private void DatawriteAdd(Intent data) {//Записываем в Pref
         sPref = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor edit = sPref.edit();
-        list.add(new UserInfo(data.getStringExtra("goal"), data.getStringExtra("des")));
+        UserInfo obj = new UserInfo();
+        obj.setGoal(data.getStringExtra("goal"));
+        obj.setDes(data.getStringExtra("des"));
+        list.add(obj);
         Gson gson = new Gson();
         String json = gson.toJson(list);
         edit.putString(SAVED_LIST, json);
